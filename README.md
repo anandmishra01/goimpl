@@ -1,12 +1,15 @@
-goimpl [![Build Status](https://travis-ci.org/sasha-s/goimpl.svg?branch=master)](https://travis-ci.org/sasha-s/goimpl)
+goimpl [![Build Status](https://travis-ci.org/anandmishra01/goimpl.svg?branch=master)](https://travis-ci.org/anandmishra01/goimpl)
 ======
+
+Forked from [goimpl](https://github.com/sasha-s/goimpl) to add an improvement for my personal project, in which I needed to plugin this to go generate for linking the generated stub to their implementations.
 
 A tool to generate stub implementation of an interface.
 
 The output is printed to stdout, errors (if any) &mdash; to stderr.
-##Installation
+
+## Installation
 ```sh
-go get github.com/sasha-s/goimpl/cmd/goimpl
+go get github.com/anandmishra01/goimpl/cmd/goimpl
 ```
 ## In a nutshell
 ```sh
@@ -21,15 +24,15 @@ package pkg
 type impl struct{}
 
 func (i *impl) Close() (err error) {
-    return
+    return close()
 }
 
 func (i *impl) Read(u []uint8) (i1 int, err error) {
-    return
+    return read(u)
 }
 
 func (i *impl) Write(u []uint8) (i1 int, err error) {
-    return
+    return write(u)
 }
 ```
 

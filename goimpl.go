@@ -24,7 +24,7 @@ type GenOpts struct {
 	ImplName            string              // type (struct) that would implement the interface.
 	Inter               reflect.Type        // Interface to implement.
 	Existing            interface{}         // Existing type that we want to implement the interface.
-	NoNamedReturnValues bool                // Do not generate named return values. The generated code might not compiple if this is set.
+	NoNamedReturnValues bool                // Do not generate named return values. The generated code might not compile if this is set.
 	MethodBlacklist     map[string]struct{} // Would not generate the code for those methods.
 	Comments            map[string]string   // Add comments to those methods in generated code.
 	NoGoImports         bool                // No goimports if set. Faster. The generated code might not compile.
@@ -345,6 +345,14 @@ func packageAndName(t reflect.Type) (pkgName, name string) {
 	return parts[0], name
 }
 
+// placeHolderFunctionName does lowercase first char
+func placeHolderFunctionName(s string) string{
+	for i, v := range s {
+		return string(unicode.ToLower(v)) + s[i+1:]
+	}
+	return ""
+}
+
 var errorType = reflect.TypeOf((*error)(nil)).Elem()
 var ctxType = reflect.TypeOf((*context.Context)(nil)).Elem()
 
@@ -362,7 +370,7 @@ type {{.Clean .ImplName}} struct{}
 {{range $R.Methods .Inter}}
 {{if .Comment}}// {{ .Comment}} {{end}}
 func ({{$rec}} {{$R.ImplName}}) {{.Name}} ({{range .Inputs}} {{.ArgName}} {{$R.GetName .}} {{.Sep}} {{end}}) ({{range .Outputs}} {{if not $R.NoNamedReturnValues}} {{.ArgName}} {{end}} {{$R.GetName .}} {{.Sep}} {{end}}) {
-	panic(errors.New("{{$R.ImplName}}.{{.Name}} not implemented")) }
+	return {{.Name | PlaceHolderFunctionName}}({{range .Inputs}} {{.ArgName}} {{.Sep}} {{end}}) }
 {{end}}
 `
 
@@ -371,7 +379,10 @@ var _ = `{{if $R.NoNamedReturnValues}} {{range .Inputs}} _ {{if eq .Sep ""}} = {
 var tm = template.New("impl")
 
 func init() {
-	_, err := tm.Parse(templateS)
+	funcMap := template.FuncMap{
+		"PlaceHolderFunctionName": placeHolderFunctionName,
+	}
+	_, err := tm.Funcs(funcMap).Parse(templateS)
 	if err != nil {
 		panic(err)
 	}

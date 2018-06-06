@@ -150,7 +150,7 @@ package main
 
 import (
 	"reflect"
-	"github.com/sasha-s/goimpl"
+	"github.com/anandmishra01/goimpl"
 	{{range .Extra}}"{{.}}"
 	{{end}}
 )

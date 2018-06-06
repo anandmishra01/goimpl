@@ -28,18 +28,14 @@ func TestMethods(t *testing.T) {
 			},
 			expected: `package pkg
 
-import (
-	"errors"
-)
-
 type Impl struct{}
 
 func (i *Impl) Close() error {
-	panic(errors.New("*Impl.Close not implemented"))
+	return close()
 }
 
 func (i *Impl) Read(u []uint8) (int, error) {
-	panic(errors.New("*Impl.Read not implemented"))
+	return read(u)
 }
 `,
 		}, {
@@ -49,25 +45,22 @@ func (i *Impl) Read(u []uint8) (int, error) {
 			},
 			expected: strings.Replace(`package goimpl
 
-import (
-	"errors"
-	"net/rpc"
-)
+import "net/rpc"
 
 type AlmostClientCodec struct{}
 
 // number of inputs: had 1, want 0
 func (a AlmostClientCodec) Close() (err error) {
-	panic(errors.New("AlmostClientCodec.Close not implemented"))
+	return close()
 }
 
 func (a AlmostClientCodec) ReadResponseBody(i interface{}) (err error) {
-	panic(errors.New("AlmostClientCodec.ReadResponseBody not implemented"))
+	return readResponseBody(i)
 }
 
 // inputs[0]: had 'interface {}' want '*rpc.Request'; inputs[1]: had '*rpc.Request' want 'interface {}'
 func (a AlmostClientCodec) WriteRequest(r *rpc.Request, i interface{}) (err error) {
-	panic(errors.New("AlmostClientCodec.WriteRequest not implemented"))
+	return writeRequest(r, i)
 }
 `, "'", "`", -1),
 		},
